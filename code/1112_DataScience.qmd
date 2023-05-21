@@ -1,0 +1,200 @@
+---
+title: ""
+subtitle: ""
+author: "第三組"
+date: \today
+output: html_document
+---
+
+載入所需套件
+```{r warning=FALSE}
+library(caret)
+library(gtsummary)
+library(ggvis)
+library(tidyverse)
+library(tidymodels)
+library(ggplot2)
+library(ggthemes)
+library(ggstatsplot)
+library(plotly)
+library(readxl)
+library(rstatix)
+library(magrittr)
+library(rgl)
+library(ggfittext)
+library(DescrTab2)
+library(neuralnet)
+library(RColorBrewer)
+library(viridis)
+library(summarytools)
+library(DataExplorer)
+library(baguette)
+library(ModelMetrics)
+```
+
+載入資料集
+```{r}
+esigned <- read_csv("../data/P39-Financial-Data.csv")
+```
+
+設定變數型別
+```{r}
+esigned %<>% mutate(entry_id = as.character(entry_id), home_owner = as.factor(home_owner), has_debt = as.factor(has_debt), e_signed = as.factor(e_signed))
+```
+
+```{r}
+esigned %<>% select(-entry_id)
+```
+
+檢視統計資料
+```{r}
+esigned %>% dfSummary()
+esigned %>% skimr::skim()
+```
+
+以年齡做分組統計人數
+```{r}
+(ggplot(esigned, aes(x = age)) +
+geom_histogram(binwidth = 10, fill = "orange") + 
+geom_freqpoly(binwidth = 10) + 
+geom_text(aes(label = ..count..), stat = "bin", binwidth = 10) + 
+theme_economist_white()) %>% 
+ggplotly()
+```
+
+以收入做分組統計人數
+```{r}
+(ggplot(esigned, aes(x = income)) +
+geom_histogram(binwidth = 2000, fill = "purple") + 
+geom_freqpoly(binwidth = 2000) + 
+geom_text(aes(label = ..count..), stat = "bin", binwidth = 2000) + 
+theme_economist_white()) %>% 
+ggplotly()
+```
+
+年齡密度圖
+```{r}
+ggplot(esigned) + 
+geom_density(aes(x = age))
+```
+
+付款計畫長條圖圓餅圖
+```{r}
+(ggplot(esigned, aes(x = pay_schedule, fill = pay_schedule)) +
+geom_bar() + 
+scale_fill_brewer(palette = "Accent") + 
+geom_text(aes(label = ..count..), stat = "count")) %>% 
+ggplotly()
+```
+
+付款計畫圓餅圖
+```{r}
+ggplot(esigned, aes(x = "", fill = pay_schedule)) +
+geom_bar() + 
+coord_polar(theta = "y") + 
+scale_fill_brewer(palette = "Accent") + 
+theme_void()
+```
+
+以年齡做分組的收入箱型圖
+```{r}
+ggplot(esigned, aes(x = cut_width(age, 10), y = income)) +
+geom_boxplot(notch = TRUE, fill = "pink") + 
+xlab("age") +
+theme_economist_white()
+```
+
+以收入做分組的貸款箱型圖
+```{r}
+ggplot(esigned, aes(x = cut_width(income, 2000), y = amount_requested)) +
+geom_boxplot(notch = TRUE, fill = "yellow") + 
+xlab("income") + 
+theme_economist_white()
+```
+
+```{r}
+ggplot(esigned) + 
+aes(x = cut_width(income, 2000), fill = home_owner) + 
+xlab("income") + 
+ylab("percent") + 
+geom_bar(position = "fill") +
+scale_fill_brewer(palette = "Set1")
+
+ggplot(esigned) + 
+aes(x = cut_width(income, 2000), fill = has_debt) + 
+xlab("income") + 
+ylab("percent") + 
+geom_bar(position = "fill") +
+scale_fill_brewer(palette = "Set1")
+
+ggplot(esigned) + 
+aes(x = cut_width(age, 10), fill = home_owner) + 
+xlab("income") + 
+ylab("percent") + 
+geom_bar(position = "fill") +
+scale_fill_brewer(palette = "Set1")
+
+ggplot(esigned) + 
+aes(x = cut_width(age, 10), fill = has_debt) + 
+xlab("income") + 
+ylab("percent") + 
+geom_bar(position = "fill") +
+scale_fill_brewer(palette = "Set1")
+```
+
+```{r}
+ggplot(esigned) + 
+aes(x = age, y = income, color = has_debt, size = amount_requested) + 
+geom_point() + 
+scale_color_manual(values = brewer.pal(3, "Set1"))
+```
+
+```{r}
+ggplot(esigned) +
+aes(x = amount_requested, y = risk_score) +
+geom_hex() + 
+paletteer::scale_fill_paletteer_c(palette = "pals::kovesi.cyclic_mygbm_30_95_c78")
+```
+
+```{r}
+plot_correlation(esigned %>% select(income, amount_requested, years_employed, risk_score, risk_score_2, risk_score_3, risk_score_4, risk_score_5))
+```
+
+```{r}
+ggplot(esigned) +
+geom_point(aes(x = amount_requested, y = risk_score, colour = e_signed, shape = has_debt, size = age)) + geom_smooth(aes(x = amount_requested, y = risk_score, colour = e_signed), method = lm)
+```
+
+```{r}
+plot_ly(esigned, x = ~income, y = ~amount_requested, z = ~risk_score)
+```
+
+```{r}
+rec <- recipe(~., data = esigned)
+pca_trans <- rec %>%
+  step_normalize(all_numeric()) %>%
+  step_pca(all_numeric(), num_comp = 5)
+pca_estimates <- prep(pca_trans, training = esigned)
+pca_data <- bake(pca_estimates, esigned)
+```
+
+```{r}
+pca_data
+```
+
+```{r}
+decision_tree_rpart_spec <-
+  decision_tree() %>%
+  set_engine('rpart') %>% 
+  set_mode('classification')
+
+decision_tree <- workflow() %>%
+  add_model(decision_tree_rpart_spec) %>%
+  add_formula(e_signed ~ .)
+
+fitted_decision_tree <- fit(decision_tree, data = esigned)
+decision_tree_predict_value <- predict(fitted_decision_tree, esigned)
+
+caret::confusionMatrix(data = decision_tree_predict_value$.pred_class, reference = esigned$e_signed, positive = "1", mode = "everything")
+```
+
