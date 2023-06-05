@@ -60,6 +60,7 @@ idea by Noble WS (2009) [A Quick Guide to Organizing Computational Biology Proje
   * xgboost
   * ggbiplot
   * pROC
+  * recipeselectors
   * gtsummary
   * ggvis
   * tidyverse
