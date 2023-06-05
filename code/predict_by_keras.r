@@ -1,5 +1,5 @@
 # 讀取數據
-data <- read.csv("P39-Financial-Data.csv", header = TRUE, na.strings = "")
+data <- read.csv("../data/P39-Financial-Data.csv", header = TRUE, na.strings = "")
 
 unique_contents <- unique(data$pay_schedule)
 print(unique_contents)
@@ -24,7 +24,7 @@ df <- shuffled_df[, !(colnames(shuffled_df) %in% c("entry_id", "pay_schedule"))]
 column_names <- colnames(df)
 print(column_names)
 
-# 選擇需要標準化的co;lumn
+# 選擇需要標準化的column
 columns_to_scale <- c(
     "age", "income", "months_employed", "years_employed",
     "current_address_year", "personal_account_m", "personal_account_y",
@@ -45,61 +45,50 @@ index <- sample(1:nrow(df_scaled), n)
 train <- df_scaled[-index, ]
 test <- df_scaled[index, ]
 
+##################################################################################
 
-# Logistics Regression
-library(e1071)
-model_logistics <- glm(e_signed ~ .,
-    family = binomial(link = "logit"), data = train
-)
-predict_logistics <- predict(model_logistics, test, type = "response")
-predict_logistics <- ifelse(predict_logistics > 0.5, 1, 0)
-predict_logistics
-Accuracy_logistics <- mean(predict_logistics == test$e_signed)
-Accuracy_logistics
-table(true = test$e_signed, predict = predict_logistics)
-
-# 加载所需套件keras
+# 加載所需套件keras
 library(keras)
 
 # 創建模型
 model <- keras_model_sequential()
 model %>%
-    layer_dense(units = 8, input_shape = ncol(train) - 1, activation = "relu") %>%
-    layer_dense(units = 16, activation = "relu") %>%
-    layer_dense(units = 32, activation = "relu") %>%
-    # layer_dense(units = 64, activation = "relu") %>%
-    # layer_dense(units = 64, activation = "relu") %>%
-    layer_dense(units = 32, activation = "relu") %>%
-    layer_dense(units = 16, activation = "relu") %>%
-    layer_dense(units = 8, activation = "relu") %>%
-    layer_dense(units = 4, activation = "relu") %>%
-    layer_dense(units = 2, activation = "relu") %>%
-    layer_dense(units = 1, activation = "sigmoid")
+  layer_dense(units = 8, input_shape = ncol(train) - 1, activation = "relu") %>%
+  layer_dense(units = 16, activation = "relu") %>%
+  layer_dense(units = 32, activation = "relu") %>%
+  # layer_dense(units = 64, activation = "relu") %>%
+  # layer_dense(units = 64, activation = "relu") %>%
+  layer_dense(units = 32, activation = "relu") %>%
+  layer_dense(units = 16, activation = "relu") %>%
+  layer_dense(units = 8, activation = "relu") %>%
+  layer_dense(units = 4, activation = "relu") %>%
+  layer_dense(units = 2, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
 
-# 编译模型
+# 編譯模型
 model %>% compile(
-    loss = "binary_crossentropy",
-    optimizer = optimizer_adam(),
-    metrics = c("accuracy")
+  loss = "binary_crossentropy",
+  optimizer = optimizer_adam(),
+  metrics = c("accuracy")
 )
 
-# 拟合模型
+# 擬和
 history <- model %>% fit(
-    x = as.matrix(train[, -3]),
-    y = train[, 3],
-    epochs = 50,
-    batch_size = 100,
-    validation_split = 0.1
+  x = as.matrix(train[, -3]),
+  y = train[, 3],
+  epochs = 50,
+  batch_size = 100,
+  validation_split = 0.1
 )
 
-# 预测
+# 預測
 predictions <- predict(model, as.matrix(test[, -3]))
 predictions <- ifelse(predictions > 0.5, "1", "0")
 
-# 创建混淆矩阵
+# 混淆矩陣
 cm <- table(test$e_signed, predictions, dnn = c("實際", "預測"))
 print(cm)
 
-# 计算准确率
+# 準確度
 accuracy <- sum(diag(cm)) / sum(cm)
 print(paste("準確率：", accuracy))

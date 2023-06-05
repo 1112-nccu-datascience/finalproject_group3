@@ -45,13 +45,14 @@ test <- df_scaled[index, ]
 
 ##################################################################################
 
-# Adaboost
-library(ada)
-model_adaboost <- ada(e_signed ~ ., data = train)
-
-predict_adaboost <- predict(model_adaboost, test)
-
-accuracy_adaboost <- mean(predict_adaboost == test$e_signed)
-accuracy_adaboost
-
-table(true = test$e_signed, predict = predict_adaboost)
+# Logistics Regression
+library(e1071)
+model_logistics <- glm(e_signed ~ .,
+    family = binomial(link = "logit"), data = train
+)
+predict_logistics <- predict(model_logistics, test, type = "response")
+predict_logistics <- ifelse(predict_logistics > 0.5, 1, 0)
+predict_logistics
+Accuracy_logistics <- mean(predict_logistics == test$e_signed)
+Accuracy_logistics
+table(true = test$e_signed, predict = predict_logistics)
