@@ -4,11 +4,11 @@
 ## Contributors
 |組員|系級|學號|工作分配|
 |-|-|-|-|
-|楊皓丞|資科三|109703008|團隊中的吉祥物🦒，負責增進團隊氣氛，特徵工程| 
-|陳芸|資科三|109703043|模型訓練|
-|王世揚|資科三|109703006|模型訓練|
-|戴士瑋|企三乙|109305082|模型評估|
-|池田美和|資科三|109703036|資料視覺化、製作海報|
+|楊皓丞|資科三|109703008|簡報製作、建立模型（SVM、KNN、XGBoost）、特徵工程（PCA、Lasso feature selection、MRMR feature selection）| 
+|陳芸|資科三|109703043|建立模型（Decision Tree、Random Forest、Bagging Tree）|
+|王世揚|資科三|109703006|建立模型（Logistic Regression、Adaboost、Dense Neural Network）|
+|戴士瑋|企三乙|109305082|模型效能評估（ROC、AUC、Precision、Recall、F1、Accuracy、Sensitivity、Specificity）|
+|池田美和|資科三|109703036|探索性資料分析、資料視覺化、製作海報|
 
 ## Quick start
 You might provide an example commend or few commends to reproduce your analysis, i.e., the following R script
@@ -44,6 +44,22 @@ idea by Noble WS (2009) [A Quick Guide to Organizing Computational Biology Proje
 
 ## References
 * Packages you use
+  * hexbin
+  * pals
+  * RColorBrewer
+  * rpart
+  * rpart.plot
+  * randomForest
+  * ipred
+  * ada
+  * e1071
+  * keras
+  * kernlab
+  * ROCit
+  * kknn
+  * xgboost
+  * ggbiplot
+  * pROC
   * gtsummary
   * ggvis
   * tidyverse
