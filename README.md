@@ -53,7 +53,7 @@ idea by Noble WS (2009) [A Quick Guide to Organizing Computational Biology Proje
   * ipred
   * ada
   * e1071
-  * keras
+  * keras （同時需要Python環境及tensorflow套件）
   * kernlab
   * ROCit
   * kknn
@@ -71,6 +71,9 @@ idea by Noble WS (2009) [A Quick Guide to Organizing Computational Biology Proje
   * ggthemes
   * plotly
   * magrittr
+  * praznik
+  * colino
+  * glmnet
   * rgl
   * ggfittext
   * DescrTab2
