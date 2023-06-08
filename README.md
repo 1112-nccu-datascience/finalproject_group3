@@ -11,27 +11,28 @@
 |池田美和|資科三|109703036|探索性資料分析、資料視覺化、製作海報|
 
 ## Quick start
+直接執行即可
 ```R
 Rscript code/script.R
 ```
 
 ## Folder organization and its related description
-idea by Noble WS (2009) [A Quick Guide to Organizing Computational Biology Projects.](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1000424) PLoS Comput Biol 5(7): e1000424.
 
 ### docs
 * Your presentation, 1112_DS-FP_group3.pptx
-* Any related document for the project
-  * i.e., software user guide
 
 ### data
 * Input
   * Source
   * Format: csv
-  * Size 
+  * Size: 17908 records
 * Output
 
 ### code
 * Analysis steps
+  * 使用不同模型觀察性能指標
+  * 選出性能較好指標後，進行超參數調整
+  * 分析變數重要性
 * Which method or package do you use? 
   * original packages in the paper
   * additional packages you found
